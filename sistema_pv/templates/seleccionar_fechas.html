@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="text-2xl font-bold mb-4">Reporte de ventas por período</h2>
+<form method="GET" action="{{ url_for('reportes.reporte_ventas_periodo') }}" class="bg-white p-6 rounded shadow">
+    <div class="mb-4">
+        <label>Fecha inicio</label>
+        <input type="date" name="fecha_inicio" required class="border p-2 rounded w-full">
+    </div>
+    <div class="mb-4">
+        <label>Fecha fin</label>
+        <input type="date" name="fecha_fin" required class="border p-2 rounded w-full">
+    </div>
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Generar PDF</button>
+</form>
+{% endblock %}

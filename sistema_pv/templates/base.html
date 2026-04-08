@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Architect POS</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "secondary-container": "#d5e3fc",
+                        "surface-bright": "#f6fafe",
+                        "secondary-fixed": "#d5e3fc",
+                        "primary": "#00478d",
+                        "secondary-fixed-dim": "#b9c7df",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#dfe3e7",
+                        "on-error-container": "#93000a",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#3a485b",
+                        "primary-fixed-dim": "#a9c7ff",
+                        "surface-dim": "#d6dade",
+                        "surface": "#f6fafe",
+                        "outline": "#727783",
+                        "on-tertiary-container": "#9fecad",
+                        "background": "#f6fafe",
+                        "surface-tint": "#005db6",
+                        "on-tertiary-fixed": "#00210b",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#0d1c2e",
+                        "surface-container-high": "#e4e9ed",
+                        "on-primary-fixed": "#001b3d",
+                        "error-container": "#ffdad6",
+                        "outline-variant": "#c2c6d4",
+                        "surface-container-highest": "#dfe3e7",
+                        "surface-container-low": "#f0f4f8",
+                        "tertiary-fixed": "#a6f4b5",
+                        "tertiary-fixed-dim": "#8bd79b",
+                        "tertiary": "#005427",
+                        "on-tertiary-fixed-variant": "#005226",
+                        "surface-container": "#eaeef2",
+                        "tertiary-container": "#206d3b",
+                        "primary-fixed": "#d6e3ff",
+                        "on-secondary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#171c1f",
+                        "on-primary-fixed-variant": "#00468c",
+                        "on-surface-variant": "#424752",
+                        "secondary": "#515f74",
+                        "on-secondary-container": "#57657a",
+                        "primary-container": "#005eb8",
+                        "inverse-on-surface": "#edf1f5",
+                        "inverse-surface": "#2c3134",
+                        "on-primary-container": "#c8daff",
+                        "inverse-primary": "#a9c7ff",
+                        "on-background": "#171c1f"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f6fafe;
+            color: #171c1f;
+        }
+
+        .font-headline {
+            font-family: 'Manrope', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c2c6d4;
+            border-radius: 0.5rem;
+        }
+
+        .gradient-primary {
+            background: linear-gradient(135deg, #00478d 0%, #005eb8 100%);
+        }
+    </style>
+
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
+
+    <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
+</head>
+
+<body class="bg-surface text-on-surface">
+    <!-- SideNavBar Component -->
+    <aside class="fixed left-0 top-0 h-full flex flex-col p-4 z-40 bg-slate-100 dark:bg-slate-900 w-64">
+        <div class="mb-8 px-2">
+            <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-50 font-headline">Architect POS
+            </h1>
+        </div>
+        <nav class="flex-1 space-y-1 overflow-y-auto overflow-x-hidden">
+            <!-- Active Tab: Dashboard -->
+            <a class="flex items-center gap-3 px-3 py-2 {{ 'bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 font-semibold rounded-lg shadow-sm scale-95 duration-150 transition-all'
+                if request.path == '/' 
+                else 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200'}} "
+                href="{{ url_for('index') }}">
+                <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                <span class="font-label text-sm">Dashboard</span>
+            </a>
+            <a class="flex items-center gap-3 px-3 py-2 {{ 'bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 font-semibold rounded-lg shadow-sm scale-95 duration-150 transition-all'
+                if request.path == '/ventas/' 
+                else 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200'}} "
+                href="{{ url_for('ventas.lista_ventas') }}">
+                <span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+                <span class="font-label text-sm">Ventas</span>
+            </a>
+            <a class="flex items-center gap-3 px-3 py-2 {{ 'bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 font-semibold rounded-lg shadow-sm scale-95 duration-150 transition-all'
+                if request.path == '/inventario/' 
+                else 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200'}} "
+                href="{{ url_for('inventario.lista_inventario') }}">
+                <span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+                <span class="font-label text-sm">Inventario</span>
+            </a>
+            <a class="flex items-center gap-3 px-3 py-2 {{ 'bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 font-semibold rounded-lg shadow-sm scale-95 duration-150 transition-all'
+                if request.path == '/compras/' 
+                else 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200'}} "
+                href="{{ url_for('compras.lista_compras') }}">
+                <span class="material-symbols-outlined" data-icon="two_pager_store">two_pager_store</span>
+                <span class="font-label text-sm">Compras</span>
+            </a>
+            {% if current_user.is_authenticated and current_user.rol == 'admin' %}
+                <a class="flex items-center gap-3 px-3 py-2 {{ 'bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 font-semibold rounded-lg shadow-sm scale-95 duration-150 transition-all'
+                if request.path == '/usuarios/' 
+                else 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200'}} "
+                    href="{{ url_for('usuarios.lista_usuarios') }}">
+                    <span class="material-symbols-outlined" data-icon="diversity_3">diversity_3</span>
+                    <span class="font-label text-sm">Usuarios</span>
+                </a>
+            {% endif %}
+        </nav>
+        <div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-800 space-y-1">
+            <a href="{{ url_for('ventas.nueva_venta') }}"
+                class="w-full gradient-primary text-white py-2.5 rounded-lg font-bold text-sm tracking-wide uppercase mb-4 shadow-lg active:scale-95 transition-all block text-center">
+                Nueva Venta
+            </a>
+            <a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200"
+                href="{{ url_for('auth.logout') }}">
+                <span class="material-symbols-outlined" data-icon="logout">logout</span>
+                <span class="font-label text-sm">Cerrar Sesión</span>
+            </a>
+        </div>
+    </aside>
+    <!-- TopAppBar Component -->
+    <header
+        class="fixed top-0 right-0 left-64 h-16 flex items-center justify-between px-8 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md">
+        <div class="flex items-center gap-8 flex-1">
+            <div class="relative w-96 group">
+                
+                <div x-data="{ open: false }" class="relative inline-block">
+                <button @click="open = !open" class="bg-blue-900 text-white px-4 py-2 rounded">
+                    Reportes ▼
+                </button>
+
+                <div x-show="open" @click.away="open = false" 
+                    x-transition
+                    class="absolute left-0 mt-2 bg-white shadow-lg rounded min-w-[160px] z-10">
+                    <a target="_blank" href="{{ url_for('reportes.reporte_diario') }}" class="block px-4 py-2 hover:bg-gray-100">Corte de caja</a>
+                    <a target="_blank" href="{{ url_for('reportes.formulario_periodo') }}" class="block px-4 py-2 hover:bg-gray-100">Ventas por período</a>
+                </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="h-8 w-px bg-slate-200 dark:bg-slate-800 mx-2"></div>
+            <div class="flex items-center gap-3 cursor-pointer group">
+                <div class="text-right">
+                    <p class="text-xs font-bold text-slate-900 dark:text-slate-100">{{ current_user.nombre }}</p>
+                    <p class="text-[10px] text-slate-500 font-medium">{{ current_user.rol }}</p>
+                </div>
+                <img alt="User Profile"
+                    class="h-10 w-10 rounded-full object-cover ring-2 ring-transparent group-hover:ring-blue-500 transition-all"
+                    data-alt="close-up portrait of a professional man in a business setting with soft natural lighting and modern office background"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGdMelhSAgoP86LcxRlA5F80Bf6AluLnomMo8tXkWWcuocJNVfhDeA6_Veg8SnnqWuOuaDd0r-chRAhr6CjOKX7iwORhyOO5xqIAWG2_4aXyYs16s9h9oH6YE3fvsFB5BRMYPAITuaxZP6xprsRIS_bDBRmwROakC6sfn1f-2Xw1LxwkTX2lgokPHlo8QvCKu5MXeyq0Eq69buPyd73BoKyyCjWiTmGI7v_ye-s_sNpqHH8nxOzNGKdx1vN3dN3XT7_JnX3fHtyoT9" />
+            </div>
+        </div>
+    </header>
+    <!-- Main Content Stage -->
+    <main class="ml-64 mt-16 p-8 bg-surface min-h-screen">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" type="text/javascript"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+                {% for category, message in messages %}
+                <script>
+                    Swal.fire({
+                        toast: true,
+                        theme: 'dark',
+                        position: 'top-end',
+                        icon: '{{ category if category else 'info' }}',
+                        title: '{{ message }}',
+                        showConfirmButton: false,
+                        showCloseButton: true,
+                        timer: 6000,
+                        timerProgressBar: true
+                    })
+                </script>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

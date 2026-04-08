@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="text-2xl font-headline font-bold mb-4">Compra #{{ compra.id }}</h1>
+
+<div class="bg-white rounded-lg shadow p-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><strong>Fecha:</strong> {{ compra.fecha.strftime('%d/%m/%Y %H:%M') }}</div>
+        <div><strong>Proveedor:</strong> {{ compra.proveedor or '-' }}</div>
+        <div><strong>Factura:</strong> {{ compra.factura or '-' }}</div>
+        <div><strong>Observaciones:</strong> {{ compra.observaciones or '-' }}</div>
+    </div>
+</div>
+
+<h2 class="text-xl font-semibold mb-3">Productos comprados</h2>
+<div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Producto</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cantidad</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Precio unitario</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detalle in compra.detalles %}
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">{{ detalle.inventario.nombre }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">{{ detalle.cantidad }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">${{ "%.2f"|format(detalle.precio_unitario) if detalle.precio_unitario else '-' }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">${{ "%.2f"|format(detalle.subtotal) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr class="bg-gray-50">
+                <td colspan="3" class="px-6 py-4 text-right font-bold">Total:</td>
+                <td class="px-6 py-4 font-bold">${{ "%.2f"|format(compra.total) }}</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<div class="mt-6">
+    <a href="{{ url_for('compras.lista_compras') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Volver</a>
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="text-2xl font-headline font-bold mb-4">Venta #{{ venta.id }}</h1>
+
+<div class="bg-white rounded-lg shadow p-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><strong>Fecha:</strong> {{ venta.fecha.strftime('%d/%m/%Y %H:%M') }}</div>
+        <div><strong>Vendedor:</strong> {{ venta.usuario.nombre }}</div>
+        <div><strong>Observaciones:</strong> {{ venta.observaciones or '-' }}</div>
+    </div>
+</div>
+
+<h2 class="text-xl font-semibold mb-3">Productos vendidos</h2>
+<div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Producto</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cantidad</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Precio unitario</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detalle in venta.detalles %}
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">{{ detalle.inventario.nombre }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">{{ detalle.cantidad }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">${{ "%.2f"|format(detalle.precio_unitario) if detalle.precio_unitario else '-' }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">${{ "%.2f"|format(detalle.subtotal) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr class="bg-gray-50">
+                <td colspan="3" class="px-6 py-4 text-right font-bold">Total:</td>
+                <td class="px-6 py-4 font-bold">${{ "%.2f"|format(venta.total) }}</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<h2 class="text-xl font-semibold mb-3">Pagos</h2>
+<div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Monto</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Metodo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pagos in venta.pagos %}
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">{{ pagos.id }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">${{ "%.2f"|format(pagos.monto) }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">{{ pagos.metodo_pago }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="mt-6">
+    <a href="{{ url_for('ventas.lista_ventas') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Volver</a>
+</div>
+{% endblock %}

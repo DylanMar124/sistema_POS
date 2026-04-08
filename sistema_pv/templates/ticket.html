@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket #{{ venta.id }}</title>
+    <style>
+        /* Reset y configuración para impresión térmica */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', 'Monaco', monospace;
+            font-size: 12px;
+            line-height: 1.3;
+            background: #fff;
+            padding: 8px;
+            width: 220px;   /* Ancho típico 58mm */
+            margin: 0 auto;
+        }
+
+        /* Ocultar botón en impresión */
+        @media print {
+            .no-print {
+                display: none;
+            }
+            body {
+                padding: 0;
+                margin: 0;
+                width: auto;
+            }
+        }
+
+        .ticket {
+            width: 100%;
+        }
+
+        .header, .footer {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .header h2 {
+            font-size: 14px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .header p {
+            font-size: 10px;
+        }
+
+        .separator {
+            border-top: 1px dashed #000;
+            margin: 8px 0;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .table-products {
+            width: 100%;
+            margin: 10px 0;
+            border-collapse: collapse;
+        }
+
+        .table-products th, .table-products td {
+            text-align: left;
+            font-size: 10px;
+            padding: 2px 0;
+        }
+
+        .table-products th {
+            border-bottom: 1px dotted #000;
+        }
+
+        .table-products td:last-child {
+            text-align: right;
+        }
+
+        .totales {
+            margin-top: 8px;
+            border-top: 1px dashed #000;
+            padding-top: 5px;
+        }
+
+        .pagos {
+            margin-top: 8px;
+            font-size: 10px;
+        }
+
+        .footer {
+            margin-top: 15px;
+            font-size: 9px;
+            text-align: center;
+        }
+
+        button {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin-top: 20px;
+            font-family: monospace;
+            cursor: pointer;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="ticket">
+        <div class="header">
+            <h2>Architect POS</h2>
+            <div class="separator"></div>
+            <p><strong>Ticket #{{ venta.id }}</strong></p>
+            <p>{{ venta.fecha.strftime('%d/%m/%Y %H:%M:%S') }}</p>
+            <p>Vendedor: {{ venta.usuario.nombre if venta.usuario else 'N/A' }}</p>
+        </div>
+
+        <div class="separator"></div>
+
+        <div class="products">
+            <table class="table-products">
+                <thead>
+                    <tr>
+                        <th>Cant</th>
+                        <th>Producto</th>
+                        <th>Precio</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detalle in venta.detalles %}
+                    <tr>
+                        <td>{{ detalle.cantidad }}</td>
+                        <td>{{ detalle.inventario.nombre }}</td>
+                        <td>${{ "%.2f"|format(detalle.precio_unitario) }}</td>
+                        <td>${{ "%.2f"|format(detalle.subtotal) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="totales">
+            <div class="info-row">
+                <span>TOTAL:</span>
+                <span>${{ "%.2f"|format(venta.total) }}</span>
+            </div>
+        </div>
+
+        <div class="pagos">
+            <strong>Pagos:</strong>
+            {% for pago in venta.pagos %}
+            <div class="info-row">
+                <span>{{ pago.metodo_pago|capitalize }}:</span>
+                <span>${{ "%.2f"|format(pago.monto) }}</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if venta.observaciones %}
+        <div class="separator"></div>
+        <div class="info-row">
+            <span>Observaciones:</span>
+            <span>{{ venta.observaciones }}</span>
+        </div>
+        {% endif %}
+
+        <div class="footer">
+            <div class="separator"></div>
+            <p>¡Gracias por su compra!</p>
+        </div>
+    </div>
+
+    <button class="no-print" onclick="window.print();">Imprimir Ticket</button>
+
+</body>
+</html>

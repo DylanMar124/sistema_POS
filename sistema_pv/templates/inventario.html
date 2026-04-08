@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="font-headline font-bold text-2xl mb-4">Gestión de Inventario</h1>
+
+<!-- Quick Stats Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-surface-container-lowest p-6 rounded-xl flex flex-col gap-1">
+        <span class="text-on-surface-variant text-xs font-bold tracking-wider uppercase">Cantidad Total de Productos</span>
+        <span class="text-3xl font-extrabold text-on-surface">{{totalInventario}}</span>
+    </div>
+    <div class="bg-surface-container-lowest p-6 rounded-xl flex flex-col gap-1 border-l-4 border-error">
+        <span class="text-on-surface-variant text-xs font-bold tracking-wider uppercase">Alerta de Stock Bajo</span>
+        <span class="text-3xl font-extrabold text-error">{{stockBajoInventario}}</span>
+        <div class="mt-2 text-on-surface-variant text-xs font-medium">Accion requerida</div>
+    </div>
+    <div class="bg-surface-container-lowest p-6 rounded-xl flex flex-col gap-1">
+        <span class="text-on-surface-variant text-xs font-bold tracking-wider uppercase">Valor del Inventario</span>
+        <span class="text-3xl font-extrabold text-on-surface">{{ '${:,.2f}'.format(totalCosto) }}</span>
+        <div class="mt-2 text-on-surface-variant text-xs font-medium">Calculado con el costo actual</div>
+    </div>
+</div>
+
+<div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200" id="tablaProductos">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Costo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for i in inventario %}
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ i.id }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ i.nombre }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ i.codigo_barras }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${{ "%.2f"|format(i.precio) }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${{ "%.2f"|format(i.costo) }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm {{'text-error' if i.cantidad <= 5 else 'text-gray-900'}}">{{ i.cantidad }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <!-- Botón editar -->
+                    <button type="button" onclick="editarProducto({{ i.id }}, '{{ i.nombre  }}', {{ i.precio }}, '{{ i.codigo_barras }}', {{i.cantidad}})" 
+                        class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-3 rounded inline-flex items-center mr-2">
+                        <span class="material-symbols-outlined text-sm mr-1">edit</span> Modificar
+                    </button>
+                    <!-- Botón activar/desactivar -->
+                     <form action="{{ url_for('inventario.eliminar_producto', inventario_id=i.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded inline-flex items-center"
+                            onclick="return confirm('¿Eliminar producto?')">
+                                <span class="material-symbols-outlined text-sm mr-1">cancel</span> Eliminar
+                        </button>
+                     </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="editarProductoModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-headline font-semibold">Editar Ingrediente</h3>
+            <button type="button" onclick="closeModal('editarProductoModal')" class="text-gray-400 hover:text-gray-600">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <form action="{{ url_for('inventario.editar_inventario') }}" method="POST">
+            <input type="hidden" name="id" id="edit-id">
+            <div class="space-y-4">
+                <div>
+                    <label for="edit-nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
+                    <input type="text" id="edit-nombre" name="nombre" required 
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="edit-precio" class="block text-sm font-medium text-gray-700">Precio</label>
+                    <input type="number" step="0.01" id="edit-precio" name="precio" required 
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="edit-cantidad" class="block text-sm font-medium text-gray-700">Stock</label>
+                    <input type="number" id="edit-cantidad" name="cantidad" required 
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="edit-codigo" class="block text-sm font-medium text-gray-700">Codigo de barras</label>
+                    <input type="text" id="edit-codigo" name="codigo" required 
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button type="button" onclick="closeModal('editarProductoModal')" 
+                    class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                    Cancelar
+                </button>
+                <button type="submit" 
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Guardar cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    if (document.getElementById("tablaProductos") && typeof simpleDatatables.DataTable !== 'undefined') {
+    const dataTable = new simpleDatatables.DataTable("#tablaProductos");
+    }
+
+    // Funciones para modales
+    function openModal(id) {
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.add('hidden');
+    }
+
+    // Función para llenar modal de edición
+    function editarProducto(id, nombre, precio, codigo_barras, cantidad) {
+        document.getElementById('edit-id').value = id;
+        document.getElementById('edit-nombre').value = nombre;
+        document.getElementById('edit-precio').value = precio;
+        document.getElementById('edit-codigo').value = codigo_barras;
+        document.getElementById('edit-cantidad').value = cantidad;
+        openModal('editarProductoModal');
+    }
+
+    // Cerrar modal al hacer clic fuera del contenido
+    window.onclick = function(event) {
+        if (event.target.classList.contains('fixed')) {
+            closeModal('editarProductoModal');
+        }
+    }
+</script>
+{% endblock %}

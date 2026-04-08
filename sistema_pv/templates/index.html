@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="font-headline font-bold text-3xl text-on-surface mb-2">Bienvenido</h2>
+
+<!-- Structural Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-8 items-start">
+    <!-- Left Column: Transactions & Core Data -->
+    <div class="col-span-12 lg:col-span-8 space-y-8">
+        <!-- KPI Section: Tonal Layering -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Total Sales Today -->
+            <div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-transparent">
+                <div class="flex justify-between items-start mb-4">
+                    <p class="text-on-surface-variant font-medium text-sm">Vendido Hoy</p>
+                    <span class="material-symbols-outlined text-primary" data-icon="payments">payments</span>
+                </div>
+                <h2 class="font-headline text-3xl font-extrabold text-on-surface">${{ "%.2f"|format(total_vendido_hoy) }}</h2>
+            </div>
+            <!-- Transactions Count -->
+            <div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-transparent">
+                <div class="flex justify-between items-start mb-4">
+                    <p class="text-on-surface-variant font-medium text-sm">Total de Ventas</p>
+                    <span class="material-symbols-outlined text-secondary" data-icon="receipt">receipt</span>
+                </div>
+                <h2 class="font-headline text-3xl font-extrabold text-on-surface">{{ total_ventas_hoy }}</h2>
+            </div>
+            <!-- Inventory Health -->
+            <div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-transparent">
+                <div class="flex justify-between items-start mb-4">
+                    <p class="text-on-surface-variant font-medium text-sm">Inventario</p>
+                    <span class="material-symbols-outlined text-tertiary" data-icon="inventory">inventory</span>
+                </div>
+                <h2 class="font-headline text-3xl font-extrabold text-on-surface">{{totalInventario}}</h2>
+                <div
+                    class="mt-4 inline-flex items-center px-2 py-0.5 rounded-full bg-error-container text-on-error-container text-[11px] font-bold tracking-tight">
+                    {{stockBajoInventario}} ALERTAS DE STOCK BAJO
+                </div>
+            </div>
+        </div>
+        <!-- Hourly Performance Chart Area -->
+        <div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h3 class="font-headline text-xl font-extrabold">Ventas de la semana</h3>
+                    <p class="text-on-surface-variant text-sm">Total vendido por día (últimos 7 días)</p>
+                </div>
+                <div class="flex gap-2">
+                    <button id="export-csv-btn"
+                        class="px-4 py-1.5 rounded-lg bg-surface-container text-xs font-bold hover:bg-surface-container-high transition-colors">Exportar CSV</button>
+                </div>
+            </div>
+            <!-- Canvas para el gráfico de barras -->
+            <canvas id="weeklySalesChart" height="200"></canvas>
+        </div>
+        <!-- Recent Activity Table (No-Divider List) -->
+        <div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm">
+            <h3 class="font-headline text-xl font-extrabold mb-6">Ventas Recientes</h3>
+            <div class="space-y-4">
+                <div class="grid grid-cols-4 px-4 py-2 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">
+                    <span>ID</span>
+                    <span>Vendedor</span>
+                    <span>Total</span>
+                    <span class="text-right">Estado</span>
+                </div>
+                {% for venta in ultimas_ventas %}
+                <div class="grid grid-cols-4 items-center px-4 py-4 bg-surface-container-low rounded-lg hover:bg-secondary-container transition-colors cursor-pointer">
+                    <span class="font-bold text-sm">#{{ venta.id }}</span>
+                    <span class="text-sm">{{ venta.usuario.nombre if venta.usuario else 'N/A' }}</span>
+                    <span class="font-headline font-bold">${{ "%.2f"|format(venta.total) }}</span>
+                    <div class="text-right">
+                        {% if venta.estado %}
+                        <span class="px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant text-[10px] font-bold uppercase">Completada</span>
+                        {% else %}
+                        <span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container text-[10px] font-bold uppercase">Cancelada</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-on-surface-variant">No hay ventas recientes</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <!-- Right Column: Quick Actions & Alerts -->
+    <div class="col-span-12 lg:col-span-4 space-y-8">
+        <!-- Quick Actions Panel -->
+        <div class="bg-surface-container-highest p-8 rounded-xl shadow-sm">
+            <h3 class="font-headline text-xl font-extrabold mb-6">Acciones Rápidas</h3>
+            <div class="grid grid-cols-1 gap-3">
+                <a href="{{ url_for('ventas.nueva_venta') }}"
+                    class="flex items-center gap-4 p-4 bg-surface-container-lowest rounded-lg hover:bg-primary hover:text-white transition-all group">
+                    <div
+                        class="h-10 w-10 flex items-center justify-center rounded-full bg-primary-fixed group-hover:bg-primary-container transition-colors">
+                        <span class="material-symbols-outlined text-primary group-hover:text-white"
+                            data-icon="add_shopping_cart">add_shopping_cart</span>
+                    </div>
+                    <div class="text-left">
+                        <p class="text-sm font-bold">Nueva Venta</p>
+                        <p class="text-[10px] opacity-70">Crear una nueva venta</p>
+                    </div>
+                </a>
+                <a href="{{ url_for('compras.nueva_compra') }}"
+                    class="flex items-center gap-4 p-4 bg-surface-container-lowest rounded-lg hover:bg-primary hover:text-white transition-all group">
+                    <div
+                        class="h-10 w-10 flex items-center justify-center rounded-full bg-secondary-fixed group-hover:bg-primary-container transition-colors">
+                        <span class="material-symbols-outlined text-secondary group-hover:text-white"
+                            data-icon="add_box">add_box</span>
+                    </div>
+                    <div class="text-left">
+                        <p class="text-sm font-bold">Nueva Compra</p>
+                        <p class="text-[10px] opacity-70">Entrada de Inventario</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <!-- Low Stock Alerts Panel -->
+        <div class="bg-surface-container p-8 rounded-xl shadow-sm">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="font-headline text-lg font-extrabold text-error">Alertas de Stock Bajo</h3>
+                <span class="px-2 py-1 rounded bg-error text-white text-[10px] font-black">{{stockBajoInventario}}</span>
+            </div>
+            <div class="space-y-3">
+                {% for p in productosStockBajo %}
+                    <div class="p-3 bg-surface-container-lowest rounded-lg border-l-4 border-error">
+                    <p class="text-xs font-bold truncate">{{p.nombre}}</p>
+                    <div class="flex justify-between items-end mt-2">
+                        <span class="text-[10px] text-on-surface-variant uppercase font-bold tracking-tighter">Stock: {{p.cantidad}}
+                            unidades</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <button
+                class="w-full mt-6 py-2 border-2 border-outline-variant text-[11px] font-bold uppercase rounded-lg hover:bg-surface-container-highest transition-colors">
+                Ver Inventario Completo
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    // Datos pasados desde Flask
+    const diasSemana = {{ dias_semana | tojson }};
+    const totalesDias = {{ totales_dias | tojson }};
+
+    const ctx = document.getElementById('weeklySalesChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: diasSemana,
+            datasets: [{
+                label: 'Total vendido ($)',
+                data: totalesDias,
+                backgroundColor: 'rgba(59, 130, 246, 0.6)', // azul 500 con opacidad
+                borderColor: 'rgba(59, 130, 246, 1)',
+                borderWidth: 1,
+                borderRadius: 8,
+                barPercentage: 0.7,
+                categoryPercentage: 0.8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let value = context.raw;
+                            return `$${value.toFixed(2)}`;
+                        }
+                    }
+                },
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value;
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Monto vendido'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Día'
+                    }
+                }
+            }
+        }
+    });
+
+    // Placeholder para exportar CSV (puedes implementarlo después)
+    document.getElementById('export-csv-btn').addEventListener('click', () => {
+        let csv = "Día,Total Vendido\n";
+        for (let i = 0; i < diasSemana.length; i++) {
+            csv += `${diasSemana[i]},${totalesDias[i]}\n`;
+        }
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'ventas_semana.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+
+</script>
+{% endblock %}
